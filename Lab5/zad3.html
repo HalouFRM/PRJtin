@@ -1,0 +1,23 @@
+    <!DOCTYPE html>
+<html>
+<head>
+    <title>Tabliczka mnożenia</title>
+</head>
+<body>
+<script>
+function tabliczka(n) {
+    for (let i = 1; i <= n; i++) {
+        let row = '';
+        for (let j = 1; j <= n; j++) {
+            row += (i * j) + ' ';
+        }
+        console.log(row);
+    }
+}
+
+let n = parseFloat(prompt('Podaj rozmiar tabliczki mnożenia: '));
+tabliczka(n);
+document.write('Tabliczka mnożenia o boku ' + n + ' została wypisana w konsoli (F12)');
+</script>
+</body>
+</html>

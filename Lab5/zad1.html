@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sprawdzanie Pitagorasa</title>
+</head>
+<body>
+<script>
+function isPythagorean(x, y, z) {
+
+    const numbers = [x, y, z].sort((a, b) => a - b);
+    const a = numbers[0];
+    const b = numbers[1];
+    const c = numbers[2];
+
+    return a**2 + b**2 === c**2;
+}
+
+let a = parseFloat(prompt('Podaj a: ')); 
+let b = parseFloat(prompt('Podaj b: '));
+let c = parseFloat(prompt('Podaj c: '));
+
+if (isPythagorean(a, b, c)) {
+    document.write('mamy pitagorasa');
+} else {
+    document.write('nie mamy pitagorasa');
+}
+</script>
+</body>
+</html>

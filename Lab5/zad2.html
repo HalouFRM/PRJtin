@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pętla - Liczby podzielne</title>
+</head>
+<body>
+<script>
+function printDivisible(a, b, c) {
+    let result = '';
+    for (let i = a; i <= b; i++) {
+        if (i % c === 0) {
+            result += i + ' ';
+        }
+    }
+    return result || 'Brak liczb podzielnych przez ' + c;
+}
+
+let a = parseFloat(prompt('Podaj a (początek przedziału): '));
+let b = parseFloat(prompt('Podaj b (koniec przedziału): '));
+let c = parseFloat(prompt('Podaj c (dzielnik): '));
+
+document.write('Liczby podzielne przez ' + c + ' w przedziale od ' + a + ' do ' + b + ':<br>');
+document.write(printDivisible(a, b, c));
+</script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+    <!DOCTYPE html>
+<html>
+<head>
+    <title>choinka</title>
+</head>
+<body>
+<script>
+function choinka(n) {
+    
+    for (let i = 0; i <= n; i++){
+        let row = '';
+        for (let j = 0; j <= i; j++){
+            row += '* ';
+        }
+        console.log(row);
+    }
+}
+let n = parseFloat(prompt('Podaj rozmiar choinki: '));
+console.log(choinka(n));
+document.write('Chinka o długości ' + n + ' została wypisany w konsoli (F12)');
+</script>
+</body>
+</html>

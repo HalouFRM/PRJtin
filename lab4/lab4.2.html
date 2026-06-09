@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PJATK - Tailwind</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <nav class="bg-white border-b p-4">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between">
+            <a href="index.html" class="flex items-center space-x-3 mb-4 md:mb-0 hover:opacity-90 transition">
+                <img src="logo.png" alt="Logo PJATK" class="h-10 w-auto object-contain">
+                <span class="font-bold text-xl tracking-tight text-slate-900">PJATK</span>
+            </a>
+            
+            <ul class="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-8 text-sm font-medium text-slate-600 text-center">
+                <li><a href="#" class="hover:text-black transition">Strona główna</a></li>
+                <li><a href="#" class="hover:text-black transition">O nas</a></li>
+                <li><a href="#" class="hover:text-black transition">Oferta</a></li>
+                <li><a href="#" class="hover:text-black transition">Blog</a></li>
+                <li><a href="#" class="hover:text-black transition">Kontakt</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="text-center py-16 px-4">
+        <h1 class="text-5xl md:text-6xl font-bold mb-2 text-slate-900">Polsko-Japońska</h1>
+        <p class="text-xl md:text-2xl text-slate-500 font-light mb-8">Akademia Technik Komputerowych</p>
+        <div class="flex flex-wrap justify-center gap-4">
+            <button class="bg-blue-200 hover:bg-blue-300 text-blue-800 px-6 py-2 rounded shadow-sm transition font-medium">Dla studentów</button>
+            <button class="bg-blue-400 hover:bg-blue-500 text-white px-6 py-2 rounded shadow-sm transition font-medium">Dla kandydatów</button>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 pb-20">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div class="bg-white rounded-xl shadow-md overflow-hidden border border-slate-100 flex flex-col">
+                <img src="students.jpeg" alt="Studenci PJATK" class="w-full h-48 object-cover">
+                <div class="p-6 flex flex-col flex-grow">
+                    <h3 class="font-bold text-lg mb-2 text-slate-900">Aktualność 1</h3>
+                    <p class="text-slate-500 text-sm mb-4 leading-relaxed flex-grow">
+                        Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                    </p>
+                    <a href="#" class="text-indigo-600 text-sm font-semibold hover:text-indigo-800 transition">Więcej...</a>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md overflow-hidden border border-slate-100 flex flex-col">
+                <img src="students.jpeg" alt="Studenci PJATK" class="w-full h-48 object-cover">
+                <div class="p-6 flex flex-col flex-grow">
+                    <h3 class="font-bold text-lg mb-2 text-slate-900">Aktualność 2</h3>
+                    <p class="text-slate-500 text-sm mb-4 leading-relaxed flex-grow">
+                        Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                    </p>
+                    <a href="#" class="text-indigo-600 text-sm font-semibold hover:text-indigo-800 transition">Więcej...</a>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-md overflow-hidden border border-slate-100 flex flex-col">
+                <img src="students.jpeg" alt="Studenci PJATK" class="w-full h-48 object-cover">
+                <div class="p-6 flex flex-col flex-grow">
+                    <h3 class="font-bold text-lg mb-2 text-slate-900">Aktualność 3</h3>
+                    <p class="text-slate-500 text-sm mb-4 leading-relaxed flex-grow">
+                        Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                    </p>
+                    <a href="#" class="text-indigo-600 text-sm font-semibold hover:text-indigo-800 transition">Więcej...</a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-12 px-6">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
+            <div>
+                <h4 class="text-white font-bold text-lg mb-4">O nas</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#" class="hover:text-white transition">Wydziały</a></li>
+                    <li><a href="#" class="hover:text-white transition">Kierunki</a></li>
+                    <li><a href="#" class="hover:text-white transition">Specjalności</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold text-lg mb-4">Oferta</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#" class="hover:text-white transition">Studia dzienne</a></li>
+                    <li><a href="#" class="hover:text-white transition">Studia zaoczne</a></li>
+                    <li><a href="#" class="hover:text-white transition">Studia podyplomowe</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold text-lg mb-4">Kariera</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#" class="hover:text-white transition">Praca</a></li>
+                    <li><a href="#" class="hover:text-white transition">Staże</a></li>
+                    <li><a href="#" class="hover:text-white transition">Kursy</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-bold text-lg mb-4">Więcej</h4>
+                <ul class="space-y-2 text-sm">
+                    <li><a href="#" class="hover:text-white transition">Kontakt</a></li>
+                    <li><a href="#" class="hover:text-white transition">Polityka prywatności</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto mt-12 pt-6 border-t border-slate-800 text-center text-xs tracking-widest text-slate-500">
+            © PJATK
+        </div>
+    </footer>
+
+</body>
+</html>

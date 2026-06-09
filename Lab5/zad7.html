@@ -1,0 +1,62 @@
+    <!DOCTYPE html>
+<html>
+<head>
+    <title>polefigury</title>
+</head>
+<body>
+<script>
+function prostokont(a, b) {
+    return a * b;
+}
+function trapez(a,b,h) {
+    return (a + b) * h / 2;
+}
+function rownoleglobok(a,h){
+    return a * h;
+}
+function trojkat(a,h){
+    return (a * h) / 2;
+}
+
+function liczPole(){
+    let figura = prompt('Podaj rodzaj figury (prostokąt, trójkąt, równoległobok, trapez): ');
+    let wynik = 0;
+
+    switch(figura){
+        case "prostokąt":
+            let aP = parseFloat(prompt('Podaj długość pierwszego boku: '));
+            let bP = parseFloat(prompt('Podaj długość drugiego boku: '));
+            wynik = prostokont(aP, bP);
+            break;
+
+            case "trójkąt":
+            let aT = parseFloat(prompt('Podaj długość podstawy: '));
+            let hT = parseFloat(prompt('Podaj długość wysokości: '));
+            wynik = trojkat(aT, hT);
+            break;
+
+            case "równoległobok":   
+            let aR = parseFloat(prompt('Podaj długość podstawy: '));
+            let hR = parseFloat(prompt('Podaj długość wysokości: '));
+            wynik = rownoleglobok(aR, hR);
+            break;
+
+            case "trapez":
+            let aTr = parseFloat(prompt('Podaj długość pierwszej podstawy: '));
+            let bTr = parseFloat(prompt('Podaj długość drugiej podstawy: '));
+            let hTr = parseFloat(prompt('Podaj długość wysokości: '));
+            wynik = trapez(aTr, bTr, hTr);
+            break;  
+
+            default:
+                alert('Niepoprawna figura');
+
+    }
+
+    console.log('Pole figury ' + figura + ' wynosi: ' + wynik);
+}
+liczPole();
+
+</script>
+</body>
+</html>

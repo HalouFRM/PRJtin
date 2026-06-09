@@ -1,0 +1,135 @@
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.6;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Шапка и навигация */
+header {
+    background: white;
+    border-bottom: 1px solid #ddd;
+    padding: 15px 0;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo img {
+    height: 50px;
+}
+
+.nav-links {
+    display: flex;
+    list-style: none;
+}
+
+.nav-links li {
+    margin-left: 20px;
+    position: relative;
+}
+
+/* Разделительные линии между пунктами меню как на макете */
+.nav-links li:not(:last-child)::after {
+    content: "|";
+    color: #d92121;
+    margin-left: 20px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #d92121;
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+
+/* Основной контент (Десктоп) */
+.content-grid {
+    display: flex;
+    justify-content: space-between;
+    padding: 40px 20px;
+    gap: 30px;
+}
+
+.item {
+    flex: 1;
+}
+
+.item h2 {
+    margin-bottom: 15px;
+    color: #555;
+}
+
+/* Сетка изображений для Item 2 */
+.image-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.image-grid img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Футер */
+footer {
+    background: black;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    font-size: 0.8rem;
+}
+
+/* тут начинаетсяя версия для мобилок */
+
+@media (max-width: 768px) {
+    /* Навигация становится вертикальной */
+    nav {
+        flex-direction: column;
+    }
+
+    .nav-links {
+        flex-direction: column;
+        width: 100%;
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .nav-links li {
+        margin: 0;
+        border-top: 1px solid #ddd;
+        padding: 10px 0;
+    }
+
+    .nav-links li:not(:last-child)::after {
+        display: none; /* Убираем черточки в мобилке */
+    }
+
+    /* Контент выстраивается в колонку */
+    .content-grid {
+        flex-direction: column;
+    }
+
+    /* Сетка картинок в мобилке может стать 1 колонкой (по желанию) */
+    .image-grid {
+        grid-template-columns: 1fr;
+    }
+}
