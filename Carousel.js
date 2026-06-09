@@ -81,28 +81,22 @@ export class Carousel {
 
         this.items.forEach((item, index) => {
             const card = document.createElement('div');
-            card.className = `card-item ${item.isReceived ? 'received' : ''} ${(!isMobile && this.activeCardId === item.id) ? 'zoomed' : ''}`;
+            card.className = `card-item ${item.isReceived ? 'received' : ''}`;
             
             if (!isMobile) {
                 const rot = index * angleStep;
-                card.style.transform = this.activeCardId === item.id 
-                    ? `rotateY(${rot}deg) translateZ(${radius + 60}px) scale(1.1)` 
-                    : `rotateY(${rot}deg) translateZ(${radius}px)`;
+                card.style.transform = `rotateY(${rot}deg) translateZ(${radius}px)`;
             } else {
-                card.style.transform = this.activeCardId === item.id ? 'scale(1.05)' : 'none';
-                card.style.zIndex = this.activeCardId === item.id ? '10' : '1';
+                card.style.transform = 'none';
             }
 
-            card.addEventListener('click', () => {
-                if (this.auth.userRole === 'admin') {
+            if (this.auth.userRole === 'admin') {
+                card.addEventListener('click', () => {
                     item.isReceived = !item.isReceived;
                     this.render();
                     this.skippy.talk(item.isReceived ? "🎯 Bam! Cel zlikwidowany!" : "Plik przywrócony w systemie.");
-                } else {
-                    this.activeCardId = this.activeCardId === item.id ? null : item.id;
-                    this.render();
-                }
-            });
+                });
+            }
 
             card.innerHTML = `
                 <div class="card-img-wrapper"><img src="${item.imgUrl}" class="card-img"></div>
