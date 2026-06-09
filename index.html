@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cyberpunk 2077 HUD Wishlist</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="app">
+    <div id="errorOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);color:#fff;z-index:9999;padding:20px;overflow:auto;">
+        <h2 style="color:#f87171;margin-bottom:8px;">JavaScript Error</h2>
+        <pre id="errorText" style="white-space:pre-wrap;word-break:break-word;font-size:13px;"></pre>
+        <button id="errorClose" style="margin-top:12px;padding:8px 12px;background:#111;border:1px solid #444;color:#fff;cursor:pointer;">Close</button>
+    </div>
+    <div class="blackwall-bg-container">
+        <div class="tenor-gif-embed" data-postid="25998936" data-share-method="host" data-aspect-ratio="2.5" data-width="100%">
+            <a href="https://tenor.com/view/cyberpunk-blackwall-gif-25998936">Cyberpunk Blackwall GIF</a>
+        </div>
+    </div>
+    <div class="blackwall-overlay"></div>
+
+    <div id="authScreen" class="auth-screen">
+        <div class="text-center mb-2">
+            <h1 class="text-4xl font-black mb-1 tracking-[0.2em] text-white" style="font-family:'Orbitron'; text-shadow:0 0 15px rgba(255,255,255,0.2);">WISH_LIST</h1>
+            <p id="loadingStatus" class="text-[11px] font-bold text-cyan-400 uppercase tracking-widest animate-pulse">⚡ INITIALIZING AJAX UPLINK...</p>
+        </div>
+        
+        <div id="roleSelection" class="flex flex-col gap-4 w-full items-center hidden">
+            <button id="btnAdminMode" class="btn-hud">ADMIN_ACCESS</button>
+            <button id="btnGuestLogin" class="btn-hud !border-cyan-400 !text-cyan-400 hover:!bg-cyan-400 hover:!text-black">GUEST_SIGN_IN</button>
+            <button id="btnGuestRegister" class="btn-hud !border-cyan-400 !text-cyan-400 hover:!bg-cyan-400 hover:!text-black">GUEST_SIGN_UP</button>
+        </div>
+
+        <div id="passwordForm" class="hidden flex flex-col items-center gap-4 w-full max-w-xs px-4">
+            <input id="passwordInput" type="password" placeholder="ENTER ENCRYPTION KEY"
+                   class="input-hud text-center text-md tracking-widest font-bold !border-yellow-500/40 !text-yellow-400">
+            <p id="passwordError" class="text-xs text-rose-500 font-bold uppercase tracking-wider hidden">❌ ERROR: DECRYPTION FAILED</p>
+            <div class="flex gap-4 w-full justify-center">
+                <button id="btnSubmitPassword" class="btn-hud py-2 px-6 text-xs">VERIFY</button>
+                <button id="btnCancelPassword" class="text-xs font-bold text-gray-500 uppercase tracking-wider px-3 py-2 underline">ABORT</button>
+            </div>
+        </div>
+
+        <div id="guestAuthForm" class="hidden flex flex-col items-center gap-4 w-full max-w-xs px-4">
+            <input id="guestUsername" type="text" placeholder="ENTER GUEST LOGIN"
+                   class="input-hud text-center text-md tracking-widest font-bold !border-cyan-500/40 !text-cyan-400">
+            <input id="guestPassword" type="password" placeholder="ENTER PASSWORD"
+                   class="input-hud text-center text-md tracking-widest font-bold !border-cyan-500/40 !text-cyan-400">
+            <p id="guestAuthMessage" class="text-xs text-rose-500 font-bold uppercase tracking-wider hidden"></p>
+            <div class="flex gap-4 w-full justify-center">
+                <button id="btnGuestSubmit" class="btn-hud py-2 px-6 text-xs">SUBMIT</button>
+                <button id="btnGuestCancel" class="text-xs font-bold text-gray-500 uppercase tracking-wider px-3 py-2 underline">CANCEL</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="mainContent" class="hidden flex flex-col justify-start">
+        <div class="main-title">
+            <div class="title-badge">CYBER_WISHLIST</div>
+            <h2>TERMINAL · v2.077</h2>
+        </div>
+
+        <div class="role-badge hud-panel px-4 py-1.5 text-cyan-400">
+            <span>SYS_ROLE: <span id="roleLabel" class="cyber-yellow">GUEST</span></span>
+            <span id="btnLogout" class="cursor-pointer font-bold ml-2 border-l border-cyan-500/20 pl-2 text-white/50 hover:text-rose-400 transition">DISCONNECT</span>
+        </div>
+
+        <div id="userStatusPanel" class="user-status-panel hidden hud-panel">
+            <div class="user-status-header">
+                <span>NET_PEERS</span>
+                <div class="user-status-header-actions">
+                    <span id="userStatusCounts">0/0</span>
+                    <button id="btnToggleUserStatus" class="btn-hud btn-chat-toggle" style="margin-left:8px;">⯈</button>
+                </div>
+            </div>
+            <div class="user-status-body">
+                <div class="user-status-section">
+                    <div class="user-status-title">ONLINE</div>
+                    <ul id="onlineList" class="user-status-list"></ul>
+                </div>
+                <div class="user-status-section">
+                    <div class="user-status-title">OFFLINE</div>
+                    <ul id="offlineList" class="user-status-list"></ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="guestChatPanel" class="guest-chat-panel hidden hud-panel">
+            <div class="guest-chat-header">
+                <span>GUEST_CHAT</span>
+                <div class="guest-chat-actions">
+                    <span id="chatUserLabel" class="text-cyan-300 text-[11px]"></span>
+                    <button id="btnToggleChat" class="btn-hud btn-chat-toggle">⯈</button>
+                </div>
+            </div>
+            <div class="guest-chat-body">
+                <div id="chatMessages" class="guest-chat-messages"></div>
+                <div class="guest-chat-input-row">
+                    <input id="chatInput" type="text" placeholder="Type message..." class="input-hud guest-chat-input">
+                    <button id="btnSendChat" class="btn-hud py-2 px-4 text-xs">SEND</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="formToggle" class="form-toggle">✚</div>
+
+        <div id="adminPanel" class="form-top hud-panel !border-yellow-500/30">
+            <input id="newTitle" placeholder="DATA_NAME" class="input-hud">
+            <input id="newPrice" type="number" placeholder="PRICE (RUR)" class="input-hud">
+            <input id="newImgUrl" placeholder="IMG_UPLINK_URL" class="input-hud">
+            <button id="btnCreateItem" class="btn-hud py-2.5 px-6 text-xs shadow-none">EXECUTE_ADD</button>
+        </div>
+
+        <div class="main-body">
+            <div class="main-right">
+                <div id="scene" class="scene">
+                    <div id="carousel" class="carousel"></div>
+                </div>
+
+                <div class="nav-buttons">
+                    <button id="btnPrev" class="btn-nav">◄ CYB_PREV</button>
+                    <button id="btnNext" class="btn-nav">CYB_NEXT ▶</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="skippy-container">
+            <div id="skippyBubble" class="skippy-bubble">Загрузка ИИ Скиппи...</div>
+            <div id="skippyWrapper" class="skippy-wrapper">
+                <div class="tenor-gif-embed" data-postid="26832567" data-share-method="host" data-aspect-ratio="1" data-width="100%">
+                    <a href="https://tenor.com/view/cyberpunk2077-skippy-prepared-ready-gif-26832567">Cyberpunk2077 Skippy GIF</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" async src="https://tenor.com/embed.js"></script>
+<script>
+window.addEventListener('error', function (e) {
+    const overlay = document.getElementById('errorOverlay');
+    const text = document.getElementById('errorText');
+    overlay.style.display = 'block';
+    text.innerText = (e && e.error && e.error.stack) ? e.error.stack : (e.message || JSON.stringify(e));
+});
+window.addEventListener('unhandledrejection', function (e) {
+    const overlay = document.getElementById('errorOverlay');
+    const text = document.getElementById('errorText');
+    overlay.style.display = 'block';
+    text.innerText = e.reason ? (e.reason.stack || e.reason) : 'Unhandled rejection';
+});
+document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('errorClose');
+    btn && btn.addEventListener('click', () => document.getElementById('errorOverlay').style.display = 'none');
+});
+</script>
+<script type="module" src="main.js"></script>
+</body>
+</html>
