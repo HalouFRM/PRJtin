@@ -1,22 +1,52 @@
 export class Chat {
-    constructor(auth, skippy) {
+    constructor(auth, skippy, firebaseService = null) {
         this.auth = auth;
         this.skippy = skippy;
+        this.firebase = firebaseService;
         this.GUEST_CHAT_KEY = 'wishlist_chat_messages';
         this.chatMessagesEl = document.getElementById('chatMessages');
         this.chatReactionTypes = ['👍', '❤️', '😲', '🔥', '💀'];
+        this.chatMessages = [];
         this.initStorageListener();
     }
 
-    getMessages() {
+    async getMessages() {
+        if (this.firebase) {
+            try {
+                const data = await this.firebase.getValue(this.GUEST_CHAT_KEY);
+                return Array.isArray(data) ? data : [];
+            } catch (e) {
+                // fallback to local storage
+            }
+        }
         return JSON.parse(localStorage.getItem(this.GUEST_CHAT_KEY) || '[]');
     }
 
-    saveMessages(messages) {
+    async saveMessages(messages) {
+        if (this.firebase) {
+            try {
+                await this.firebase.setValue(this.GUEST_CHAT_KEY, messages);
+                return;
+            } catch (e) {
+                // fallback to local storage
+            }
+        }
         localStorage.setItem(this.GUEST_CHAT_KEY, JSON.stringify(messages));
     }
 
     initStorageListener() {
+        if (this.firebase) {
+            this.firebase.onValue(this.GUEST_CHAT_KEY, (messages) => {
+                this.chatMessages = Array.isArray(messages) ? messages : [];
+                if (this.auth.userRole === 'guest') this.renderChat();
+            });
+            this.firebase.onValue(this.auth.ONLINE_USERS_KEY, () => {
+                if (this.auth.userRole) this.renderUserStatus();
+            });
+            this.getMessages().then(messages => { this.chatMessages = messages; });
+            return;
+        }
+
         window.addEventListener('storage', (e) => {
             if (e.key === this.GUEST_CHAT_KEY && this.auth.userRole === 'guest') {
                 this.renderChat();
@@ -27,10 +57,12 @@ export class Chat {
         });
     }
 
-    sendMessage(text) {
+    async sendMessage(text) {
         if (this.auth.userRole !== 'guest' || !this.auth.currentGuest || !text.trim()) return;
         
-        const messages = this.getMessages();
+        const messages = this.firebase
+            ? Array.isArray(this.chatMessages) && this.chatMessages.length ? [...this.chatMessages] : await this.getMessages()
+            : await this.getMessages();
         messages.push({
             id: Date.now() + Math.floor(Math.random() * 1000),
             user: this.auth.currentGuest,
@@ -39,13 +71,16 @@ export class Chat {
             reactions: {},
             userReactions: {}
         });
-        this.saveMessages(messages);
+        await this.saveMessages(messages);
+        this.chatMessages = messages;
         this.renderChat();
     }
 
-    toggleReaction(messageId, emoji) {
+    async toggleReaction(messageId, emoji) {
         if (!this.auth.currentGuest) return;
-        const messages = this.getMessages();
+        const messages = this.firebase
+            ? Array.isArray(this.chatMessages) && this.chatMessages.length ? [...this.chatMessages] : await this.getMessages()
+            : await this.getMessages();
         const msg = messages.find(m => m.id === messageId);
         if (!msg) return;
 
@@ -64,13 +99,16 @@ export class Chat {
         }
 
         if (msg.userReactions[this.auth.currentGuest]?.length === 0) delete msg.userReactions[this.auth.currentGuest];
-        this.saveMessages(messages);
+        await this.saveMessages(messages);
+        this.chatMessages = messages;
         this.renderChat();
     }
 
-    renderChat() {
+    async renderChat() {
         if (this.auth.userRole !== 'guest') return;
-        const messages = this.getMessages();
+        const messages = this.firebase
+            ? Array.isArray(this.chatMessages) ? this.chatMessages : await this.getMessages()
+            : await this.getMessages();
         this.chatMessagesEl.innerHTML = '';
         
         messages.slice(-50).forEach((message) => {
@@ -100,10 +138,10 @@ export class Chat {
         this.chatMessagesEl.scrollTop = this.chatMessagesEl.scrollHeight;
     }
 
-    renderUserStatus() {
-        const accounts = this.auth.getAccounts();
+    async renderUserStatus() {
+        const accounts = await this.auth.getAccounts();
         const allUsers = Object.keys(accounts).sort();
-        const onlineUsers = this.auth.getOnlineUsers();
+        const onlineUsers = await this.auth.getOnlineUsers();
         const online = onlineUsers || [];
         const offline = allUsers.filter(u => !online.includes(u));
 

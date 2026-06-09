@@ -1,15 +1,28 @@
 import { Skippy } from './Skippy.js';
+import { FirebaseService } from './FirebaseService.js';
 import { Api } from './Api.js';
 import { Auth } from './Auth.js';
 import { Chat } from './Chat.js';
 import { Carousel } from './Carousel.js';
 
+// Firebase config: замените значениями вашего проекта
+const firebaseConfig = {
+    apiKey: "<YOUR_API_KEY>",
+    authDomain: "<YOUR_AUTH_DOMAIN>",
+    databaseURL: "<YOUR_DATABASE_URL>",
+    projectId: "<YOUR_PROJECT_ID>",
+    storageBucket: "<YOUR_STORAGE_BUCKET>",
+    messagingSenderId: "<YOUR_MESSAGING_SENDER_ID>",
+    appId: "<YOUR_APP_ID>"
+};
+const firebaseService = firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith('<') ? new FirebaseService(firebaseConfig) : null;
+
 // Инициализация сервисов
 const skippy = new Skippy();
-const api = new Api();
-const auth = new Auth();
-const chat = new Chat(auth, skippy);
-const carousel = new Carousel(auth, skippy);
+const auth = new Auth(firebaseService);
+const chat = new Chat(auth, skippy, firebaseService);
+const api = new Api(firebaseService);
+const carousel = new Carousel(auth, skippy, firebaseService);
 
 // DOM Элементы
 const ui = {
@@ -82,7 +95,7 @@ function showGuestForm(mode) {
     document.getElementById('btnGuestSubmit').innerText = mode === 'register' ? 'REGISTER' : 'LOGIN';
 }
 
-function handleGuest() {
+async function handleGuest() {
     const user = document.getElementById('guestUsername').value.trim();
     const pwd = document.getElementById('guestPassword').value.trim();
     const msgEl = document.getElementById('guestAuthMessage');
@@ -93,7 +106,9 @@ function handleGuest() {
         return;
     }
 
-    const res = guestAuthMode === 'register' ? auth.registerGuest(user, pwd) : auth.loginGuest(user, pwd);
+    const res = guestAuthMode === 'register'
+        ? await auth.registerGuest(user, pwd)
+        : await auth.loginGuest(user, pwd);
     
     if (res.success) {
         loginUI('guest');
@@ -133,8 +148,8 @@ function resetAuthUi() {
 }
 
 // Выход
-document.getElementById('btnLogout').addEventListener('click', () => {
-    auth.logout();
+document.getElementById('btnLogout').addEventListener('click', async () => {
+    await auth.logout();
     ui.mainContent.classList.add('hidden');
     ui.authScreen.classList.remove('hidden');
     resetAuthUi();
@@ -197,14 +212,14 @@ document.getElementById('btnCreateItem').addEventListener('click', () => {
 // Heartbeat for marking guest online and cleanup on unload
 let onlineHeartbeatId = null;
 function beforeUnloadHandler() {
-    if (auth.currentGuest) auth.markOffline(auth.currentGuest);
+    if (auth.currentGuest) auth.markOffline(auth.currentGuest).catch(() => {});
 }
 function startHeartbeat() {
     if (!auth.currentGuest) return;
-    auth.markOnline(auth.currentGuest);
+    auth.markOnline(auth.currentGuest).catch(() => {});
     if (onlineHeartbeatId) clearInterval(onlineHeartbeatId);
     onlineHeartbeatId = setInterval(() => {
-        if (auth.currentGuest) auth.markOnline(auth.currentGuest);
+        if (auth.currentGuest) auth.markOnline(auth.currentGuest).catch(() => {});
         else stopHeartbeat();
     }, 30000);
     window.addEventListener('beforeunload', beforeUnloadHandler);

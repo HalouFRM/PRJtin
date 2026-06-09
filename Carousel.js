@@ -1,17 +1,44 @@
 export class Carousel {
-    constructor(auth, skippy) {
+    constructor(auth, skippy, firebaseService = null) {
         this.auth = auth;
         this.skippy = skippy;
+        this.firebase = firebaseService;
         this.carouselEl = document.getElementById('carousel');
         this.sceneEl = document.getElementById('scene');
         this.STORAGE_KEY = 'wishlist_items';
+        this.STATUS_KEY = 'wishlist_item_statuses';
         this.items = [];
-        this.guestStatuses = JSON.parse(localStorage.getItem('my_wishlist_statuses')) || {};
+        this.guestStatuses = JSON.parse(localStorage.getItem(this.STATUS_KEY) || '{}') || {};
         this.currentIndex = 0;
         this.rotationIndex = 0;
         this.activeCardId = null;
         this.isUpdatingScroll = false;
         
+        if (this.firebase) {
+            this.firebase.onValue(this.STORAGE_KEY, (items) => {
+                if (Array.isArray(items)) {
+                    this.setItems(items);
+                    this.render();
+                }
+            });
+            this.firebase.onValue(this.STATUS_KEY, (statuses) => {
+                if (statuses && typeof statuses === 'object') {
+                    this.guestStatuses = statuses;
+                    try {
+                        localStorage.setItem(this.STATUS_KEY, JSON.stringify(statuses));
+                    } catch (e) {
+                        // ignore storage errors
+                    }
+                    if (this.items.length) {
+                        this.items.forEach(item => {
+                            if (this.guestStatuses[item.id]) item.status = this.guestStatuses[item.id];
+                        });
+                        this.render();
+                    }
+                }
+            });
+        }
+
         this.initScrollListener();
         window.addEventListener('storage', (e) => {
             if (e.key === this.STORAGE_KEY) {
@@ -19,6 +46,19 @@ export class Carousel {
                     const newItems = JSON.parse(e.newValue || '[]');
                     this.setItems(newItems);
                     this.render();
+                } catch (err) {
+                    // ignore parse errors
+                }
+            }
+            if (e.key === this.STATUS_KEY) {
+                try {
+                    this.guestStatuses = JSON.parse(e.newValue || '{}') || {};
+                    if (this.items.length) {
+                        this.items.forEach(item => {
+                            item.status = this.guestStatuses[item.id] || '';
+                        });
+                        this.render();
+                    }
                 } catch (err) {
                     // ignore parse errors
                 }
@@ -33,32 +73,65 @@ export class Carousel {
         });
     }
 
+    async saveItems(items) {
+        if (this.firebase) {
+            try {
+                await this.firebase.setValue(this.STORAGE_KEY, items);
+                return;
+            } catch (e) {
+                // fallback to local storage
+            }
+        }
+        try {
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(items));
+        } catch (e) {
+            // ignore storage errors
+        }
+    }
+
+    async saveStatuses() {
+        if (this.firebase) {
+            try {
+                await this.firebase.setValue(this.STATUS_KEY, this.guestStatuses);
+                return;
+            } catch (e) {
+                // fallback to local storage
+            }
+        }
+        try {
+            localStorage.setItem(this.STATUS_KEY, JSON.stringify(this.guestStatuses));
+        } catch (e) {
+            // ignore storage errors
+        }
+    }
+
     addItem(title, price, imgUrl) {
         this.items.push({ id: Date.now(), title, price, imgUrl, isReceived: false, status: '' });
+        this.saveItems(this.items);
         this.render();
-        this.skippy.talk("🚨 Wpis pomyślnie dodany do głównego katalogu Arasaki!");
-        try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.items)); } catch (e) {}
+        this.skippy.talk("🚨 Wpis pomyślnie dodany do gławnego katalogu Arasaki!");
     }
 
     deleteItem(id) {
         this.items = this.items.filter(i => i.id !== id);
         this.activeCardId = null;
+        this.saveItems(this.items);
         this.render();
         this.skippy.talk("⚠️ Plik usunięty bezpowrotnie! Tylko we mnie nie celuj!", true);
-        try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.items)); } catch (e) {}
     }
 
-    updateStatus(item, newStatus) {
+    async updateStatus(item, newStatus) {
         if (newStatus === 'none' || newStatus === '') {
-            item.status = ''; 
+            item.status = '';
             delete this.guestStatuses[item.id];
             this.skippy.talk("Ej! Po co kasujesz status? Kup mi lepiej amunicję!", true);
         } else {
-            item.status = newStatus; 
+            item.status = newStatus;
             this.guestStatuses[item.id] = newStatus;
             this.skippy.talk("Świetny wybór, V! Uruchamiam protokół rezerwacji celu.");
         }
-        localStorage.setItem('my_wishlist_statuses', JSON.stringify(this.guestStatuses));
+        await this.saveStatuses();
+        await this.saveItems(this.items);
         this.render();
     }
 
@@ -91,8 +164,9 @@ export class Carousel {
             }
 
             if (this.auth.userRole === 'admin') {
-                card.addEventListener('click', () => {
+                card.addEventListener('click', async () => {
                     item.isReceived = !item.isReceived;
+                    await this.saveItems(this.items);
                     this.render();
                     this.skippy.talk(item.isReceived ? "🎯 Bam! Cel zlikwidowany!" : "Plik przywrócony w systemie.");
                 });

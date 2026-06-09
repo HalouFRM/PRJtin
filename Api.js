@@ -1,10 +1,26 @@
 export class Api {
+    constructor(firebaseService = null) {
+        this.firebase = firebaseService;
+    }
+
     async fetchItems() {
         const STORAGE_KEY = 'wishlist_items';
+        if (this.firebase) {
+            try {
+                const remote = await this.firebase.getValue(STORAGE_KEY);
+                if (Array.isArray(remote) && remote.length) {
+                    return remote;
+                }
+            } catch (e) {
+                // fallback to local cache and network
+            }
+        }
+
         try {
             const stored = localStorage.getItem(STORAGE_KEY);
             if (stored) {
-                return JSON.parse(stored);
+                const parsed = JSON.parse(stored);
+                if (Array.isArray(parsed) && parsed.length) return parsed;
             }
         } catch (e) {
             // ignore parse errors and fallback to network
@@ -31,10 +47,16 @@ export class Api {
                 status: ''
             }));
             try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); } catch (e) {}
+            if (this.firebase) {
+                try { await this.firebase.setValue(STORAGE_KEY, items); } catch (e) {}
+            }
             return items;
         } catch (error) {
             const fallback = [{ id: 1, title: 'Keychron K2', price: 9000, imgUrl: 'https://picsum.photos/id/180/900/1200', isReceived: false, status: '' }];
             try { localStorage.setItem(STORAGE_KEY, JSON.stringify(fallback)); } catch (e) {}
+            if (this.firebase) {
+                try { await this.firebase.setValue(STORAGE_KEY, fallback); } catch (e) {}
+            }
             return fallback;
         }
     }
